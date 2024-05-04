@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo "Fetching the source code from the directory path: ${GITHUB_REPOSITORY}"
+                echo "Fetching the source code from the repo: ${GITHUB_REPOSITORY}"
                 echo "Building the code using Maven"
             }
         }
@@ -63,6 +63,16 @@ pipeline {
         stage('Integration Tests on Staging') {
             steps {
                 echo "Running integration tests on the staging environment using Selenium"
+            }
+            post {
+                always {
+                    emailext (
+                        subject: "Integration Tests on Staging Status: ${currentBuild.result}",
+                        body: "Staging Integration tests stage has completed with the following status: ${currentBuild.result}",
+                        attachLog: true,
+                        to: "${EMAIL_RECIPIENT}"
+                    )
+                }
             }
         }
         
